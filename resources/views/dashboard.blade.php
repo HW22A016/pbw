@@ -63,7 +63,7 @@
 
             <!-- 送信フォーム -->
              <!-- 子要素同士の上下の間隔をまとめて開ける16px -->
-            <form action="#" method="POST" class="space-y-4">
+            <form action="{{ route('reserve.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -87,7 +87,7 @@
                     </div>
                 </div>
                 <div class="pt-2">
-                    <button type="button" class="px-4 py-2 bg-indigo-400 hover:bg-indigo-700 rounded font-bold text-sm shadow">
+                    <button type="submit" class="px-4 py-2 bg-indigo-400 hover:bg-indigo-700 rounded font-bold text-sm shadow">
                         行動を予約
                     </button>
                 </div>

@@ -14,7 +14,7 @@ class DashboardController extends Controller
 
         $character = $user->character;
 
-        $currentReserve = $user->actionReserves()->where('is_processed', false)->first();
+        $currentReserve = $user->actionReserves()->first();
 
         return view('dashboard', compact('user', 'character', 'currentReserve'));
     }
