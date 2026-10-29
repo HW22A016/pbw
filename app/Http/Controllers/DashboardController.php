@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -16,6 +17,9 @@ class DashboardController extends Controller
 
         $currentReserve = $user->actionReserves()->first();
 
-        return view('dashboard', compact('user', 'character', 'currentReserve'));
+        // yyyy-mm-dd hh:mm:ss->23:59:59.9999...->YYYY-MM-DDTHH:mm:ss+TZ
+        $nextUpdateTime = Carbon::now()->ceilDay()->toIso8601String();
+
+        return view('dashboard', compact('user', 'character', 'currentReserve', 'nextUpdateTime'));
     }
 }

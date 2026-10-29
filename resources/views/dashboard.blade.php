@@ -49,6 +49,13 @@
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">次の定期更新の行動予約</h3>
 
+            <!-- 残り時間 -->
+            <!-- font-mono等幅フォント -->
+            <div class="font-extrabold text-red-600 dark:text-red-400 font-mono tracking-tight">
+                <div class="text-xs text-gray-500 dark:text-gray-400">残り時間</div>
+                <span id="countdown">{{ $nextUpdateTime }}</span>
+            </div>
+
             <!-- 現在の予約状況 -->
             @if($currentReserve->is_processed)
                 <!-- マージン下に24pxの余白, パディング16px -->
@@ -93,11 +100,38 @@
                 </div>
             </form>
         </div>
-
-        <!-- ゲームログ画面 -->
-        <!-- <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">冒険ログ</h3>
-            <div class="space-y-2">
-        </div> -->
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function()
+        {
+            const targetTimeStr = "{{ $nextUpdateTime }}";
+            const targetTime = new Date(targetTimeStr).getTime();
+            const timerElement = document.getElementById('countdown');
+
+            function updateTimer()
+            {
+                const now = new Date().getTime();
+                // 期限時刻までの残り時間(秒)
+                let distance = Math.floor((targetTime - now) / 1000);
+
+                // 時間の計算
+                const hours = Math.floor(distance / (60 * 60));
+                distance -= hours * (60 * 60);
+                const minutes = Math.floor(distance / 60);
+                distance -= minutes * 60;
+                const seconds = Math.floor(distance);
+
+                // 1桁の時2桁に揃える
+                const h = String(hours).padStart(2, '0');
+                const m = String(minutes).padStart(2, '0');
+                const s = String(seconds).padStart(2, '0');
+
+                timerElement.innerHTML = `${h}:${m}:${s}`;
+            }
+            updateTimer();
+            // 1秒ごとに実行
+            setInterval(updateTimer, 1000);
+        });
+    </script>
 </x-app-layout>
