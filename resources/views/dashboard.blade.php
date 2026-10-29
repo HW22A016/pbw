@@ -89,7 +89,7 @@
                         <select name="stance_id" class="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300">
                             <option value="1">慎重に進む</option>
                             <option value="2">普通</option>
-                            <option value="3">静かな山道</option>
+                            <option value="3">積極的に戦う</option>
                         </select>
                     </div>
                 </div>
