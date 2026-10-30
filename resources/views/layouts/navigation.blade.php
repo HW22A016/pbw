@@ -19,6 +19,10 @@
                     <x-nav-link :href="route('logs.index')" :active="request()->routeIs('logs.index')">
                         {{ __('Logs') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('characters.index')" :active="request()->routeIs('characters.index')">
+                        {{ __('characters') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -77,6 +81,10 @@
 
             <x-responsive-nav-link :href="route('logs.index')" :active="request()->routeIs('logs.index')">
                 {{ __('Logs') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('characters.index')" :active="request()->routeIs('characters.index')">
+                {{ __('characters') }}
             </x-responsive-nav-link>
         </div>
 
