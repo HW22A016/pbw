@@ -34,12 +34,12 @@
 
                     <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-center">
                         <div class="text-xs text-gray-500 dark:text-gray-400">攻撃力</div>
-                        <div class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $character->atk }}</div>
+                        <div class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $character->attack }}</div>
                     </div>
 
                     <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-center">
                         <div class="text-xs text-gray-500 dark:text-gray-400">所持金</div>
-                        <div class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $character->money }}G</div>
+                        <div class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $character->gold }}G</div>
                     </div>
                 </div>
             </div>
@@ -57,10 +57,10 @@
             </div>
 
             <!-- 現在の予約状況 -->
-            @if($currentReserve->is_processed)
+            @if($currentReserve)
                 <!-- マージン下に24pxの余白, パディング16px -->
                 <div class="mb-6 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-900 text-green-800 dark:text-green-200 rounded">
-                    現在の予約: <strong>探索先[{{ $currentReserve->location_id->label() }}]</strong> / <strong>戦闘方針[{{ $currentReserve->stance_id->label() }}]</strong>
+                    現在の予約: <strong>探索先[{{ $currentReserve?->location_id->label() }}]</strong> / <strong>戦闘方針[{{ $currentReserve?->stance_id->label() }}]</strong>
                 </div>
             @else
                 <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 rounded">
@@ -78,18 +78,22 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">探索先</label>
                         <!-- 横幅100% -->
                         <select name="location_id" class="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300">
-                            <option value="1">初心者の森</option>
-                            <option value="2">迷いの洞窟</option>
-                            <option value="3">静かな山道</option>
+                            @foreach(\App\Enums\Location::cases() as $location)
+                                <option value="{{ $location->value }}">
+                                    {{ $location->label() }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div>
                         <lavel class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">戦闘方針</label>
                         <select name="stance_id" class="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300">
-                            <option value="1">慎重に進む</option>
-                            <option value="2">普通</option>
-                            <option value="3">積極的に戦う</option>
+                            @foreach(\App\Enums\stance::cases() as $stance)
+                                <option value="{{ $stance->value }}">
+                                    {{ $stance->label() }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

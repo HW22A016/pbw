@@ -18,11 +18,14 @@ class ReserveController extends Controller
         // 予約データがあれば更新、なければ新しく作る
         // 第一引数が検索条件、第二引数が登録するデータの中身
         ActionReserve::updateOrCreate(
-            ['user_id' => Auth::id()],
+            [
+                'user_id' => Auth::id(),
+                'is_processed' => false,
+            ],
             [
                 'location_id' => $validated['location_id'],
                 'stance_id' => $validated['stance_id'],
-                'is_processed' => true,
+                'is_processed' => false,
             ]
         );
 

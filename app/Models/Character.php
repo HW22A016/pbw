@@ -12,7 +12,7 @@ class Character extends Model
         'exp',
         'max_hp',
         'hp',
-        'atk',
-        'money',
+        'attack',
+        'gold',
     ];
 }

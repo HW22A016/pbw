@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('turn_number');
+            $table->text('location');
+            $table->text('stance');
             $table->text('message');
             $table->integer('gained_exp');
             $table->integer('gained_gold');

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Location;
 use App\Enums\Stance;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ActionReserve extends Model
 {
@@ -24,5 +25,10 @@ class ActionReserve extends Model
             // DBでの0や1を自動的にfalseやtrueに変換(キャスト)してくれる
             'is_processed' => 'boolean',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

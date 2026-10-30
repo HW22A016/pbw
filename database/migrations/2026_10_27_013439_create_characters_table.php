@@ -22,8 +22,8 @@ return new class extends Migration
             $table->integer('exp')->default(0);
             $table->integer('max_hp')->default(100);
             $table->integer('hp')->default(100);
-            $table->integer('atk')->default(10);
-            $table->integer('money')->default(0);
+            $table->integer('attack')->default(10);
+            $table->integer('gold')->default(0);
             $table->timestamps();
         });
     }

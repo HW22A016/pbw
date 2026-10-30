@@ -15,7 +15,7 @@ class DashboardController extends Controller
 
         $character = $user->character;
 
-        $currentReserve = $user->actionReserves()->first();
+        $currentReserve = $user->actionReserves()->where('is_processed', false)->first();
 
         // yyyy-mm-dd hh:mm:ss->23:59:59.9999...->YYYY-MM-DDTHH:mm:ss+TZ
         $nextUpdateTime = Carbon::now()->ceilDay()->toIso8601String();

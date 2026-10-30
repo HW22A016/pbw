@@ -49,10 +49,6 @@ class RegisteredUserController extends Controller
             'user_id' => $user->id,
         ]);
 
-        ActionReserve::create([
-            'user_id' => $user->id,
-        ]);
-
         event(new Registered($user));
 
         Auth::login($user);
