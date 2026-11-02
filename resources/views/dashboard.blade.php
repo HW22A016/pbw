@@ -25,6 +25,7 @@
                     <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-center">
                         <div class="text-xs text-gray-500 dark:text-gray-400">Lv</div>
                         <div class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $character->level }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">exp:{{ $character->exp }}</div>
                     </div>
 
                     <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-center">
