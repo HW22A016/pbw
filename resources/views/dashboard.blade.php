@@ -9,7 +9,7 @@
     <div class="py-12">
         <!-- max-w-7xl:画面の最大横幅を約1280ピクセルに制限 -->
          <!-- sm:px-6:タブレット用 -->
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mb-4">
             <!-- 背景、ダークモード時の背景、要素からはみ出したら非表示、ドロップシャドウ、角をまるめる、上下左右の余白24px -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <!-- 文字を18px, 太字, テキストの色, ダークモード時のテキストの色, 外側余白16px -->
