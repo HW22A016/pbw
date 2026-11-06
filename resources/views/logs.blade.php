@@ -21,6 +21,8 @@
                             <thead>
                                 <tr>
                                     <th class="px-4 py-2 text-left">行動回数</th>
+                                    <th class="px-4 py-2 text-left">探索先</th>
+                                    <th class="px-4 py-2 text-left">戦闘方針</th>
                                     <th class="px-4 py-2 text-left">メッセージ</th>
                                     <th class="px-4 py-2 text-left">獲得経験値</th>
                                     <th class="px-4 py-2 text-left">獲得ゴールド</th>
@@ -32,6 +34,8 @@
                                 @foreach($logs as $log)
                                     <tr>
                                         <td class="px-4 py-3">#{{ $log->turn_number }}</td>
+                                        <td class="px-4 py-3">#{{ $log->location_id->label() }}</td>
+                                        <td class="px-4 py-3">#{{ $log->stance_id->label() }}</td>
                                         <td class="px-4 py-3">{{ $log->message }}</td>
                                         <td class="px-4 py-3">{{ $log->gained_exp }}</td>
                                         <td class="px-4 py-3">{{ $log->gained_gold }}</td>

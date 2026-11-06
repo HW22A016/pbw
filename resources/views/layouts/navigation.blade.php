@@ -6,7 +6,8 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <!-- <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" /> -->
+                         <img {{ $attributes->merge(['class' => 'h-12 w-auto']) }} src="{{ asset('images/img1.png') }}" alt="ロゴ">
                     </a>
                 </div>
 
@@ -19,8 +20,8 @@
                     <x-nav-link :href="route('logs.index')" :active="request()->routeIs('logs.index')">
                         {{ __('Logs') }}
                     </x-nav-link>
-
-                    <x-nav-link :href="route('characters.index')" :active="request()->routeIs('characters.index')">
+                    
+                     <x-nav-link :href="route('characters.index', ['sort' => 'level'])" :active="request()->routeIs('characters.index', ['sort' => 'level'])">
                         {{ __('characters') }}
                     </x-nav-link>
                 </div>

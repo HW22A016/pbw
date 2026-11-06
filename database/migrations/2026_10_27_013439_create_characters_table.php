@@ -20,6 +20,7 @@ return new class extends Migration
             // 初期値
             $table->integer('level')->default(1);
             $table->integer('exp')->default(0);
+            $table->integer('nextExp')->default(10);
             $table->integer('max_hp')->default(100);
             $table->integer('hp')->default(100);
             $table->integer('attack')->default(10);
