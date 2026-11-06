@@ -101,8 +101,8 @@ Schedule::call(function()
     }
 
     // 毎日0時実行
-// })->daily();
-})->everyMinute();
+})->daily();
+// })->everyMinute();
 
 function calculationDamage($minLevel, $maxLevel)
 {

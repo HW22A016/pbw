@@ -32,4 +32,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/api/cron', function() {
+    if(Request::header('X-Vercel-Cron-Secret') !== env('GAME_CRON_SECRET')){
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    // スケジュールタスクを実行
+    Artisan::call('schedule:run');
+
+    return response()->json([
+        'status' => 'success',
+        'output' => Artisan::output()
+    ]);
+});
+
 require __DIR__.'/auth.php';
