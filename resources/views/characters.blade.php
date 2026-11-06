@@ -13,7 +13,7 @@
                 <!-- focus:border-indigo-300:クリックした時の枠線の色を青紫色にする focus:ring:クリックした時にリングを発生 focus:ring-indigo-200:リングの色を薄い青紫色にする focus:ring-opacity-50:リングの透明度50% -->
                 <select name="sort" id="sort" onchange="this.form.submit()" class="rounded-md border-gray-300 dark:bg-gray-800 dark:text-gray-100 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     <option value="level" {{ request('sort') == 'level' ? 'selected' : '' }}>レベル</option>
-                    <option value="hp" {{ request('sort') == 'hp' ? 'selected' : '' }}>HP</option>
+                    <option value="max_hp" {{ request('sort') == 'max_hp' ? 'selected' : '' }}>HP</option>
                     <option value="attack" {{ request('sort') == 'attack' ? 'selected' : '' }}>攻撃力</option>
                     <option value="gold" {{ request('sort') == 'gold' ? 'selected' : '' }}>所持金</option>
                 </select>
@@ -45,7 +45,7 @@
                                     <td class="px-4 py-3">{{ $loop->iteration }}位</td>
                                     <td class="px-4 py-3">{{ $character->user->name }}</td>
                                     <td class="px-4 py-3">{{ $character->level }}</td>
-                                    <td class="px-4 py-3">{{ $character->hp }}</td>
+                                    <td class="px-4 py-3">{{ $character->max_hp }}</td>
                                     <td class="px-4 py-3">{{ $character->attack }}</td>
                                     <td class="px-4 py-3">{{ $character->gold }}</td>
                                 </tr>

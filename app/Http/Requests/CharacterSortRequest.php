@@ -33,7 +33,7 @@ class CharacterSortRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort' => ['required', Rule::in(['level', 'hp', 'attack', 'gold']),]
+            'sort' => ['required', Rule::in(['level', 'max_hp', 'attack', 'gold']),]
         ];
     }
 }

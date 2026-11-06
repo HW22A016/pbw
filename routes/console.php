@@ -27,23 +27,22 @@ Schedule::call(function()
         ['gold' => $gold, 'exp' => $exp, 'damage' => $damage] = match($reserve->location_id)
         {
             Location::FOREST => match($reserve->stance_id) {
-                Stance::CAUTIOUS => ['gold' => rand(10, 100), 'exp' => rand(10, 15), 'damage' => 0],
-                Stance::NORMAL => ['gold' => rand(100, 300), 'exp' => rand(10, 30), 'damage' => calculationDamage(5, 10)],
-                Stance::PROACTIVE => ['gold' => rand(500, 700), 'exp' => rand(50, 100), 'damage' => calculationDamage(10, 15)],
+                Stance::CAUTIOUS => ['gold' => rand(10, 100), 'exp' => rand(15, 20), 'damage' => rand(0, 15)],
+                Stance::NORMAL => ['gold' => rand(100, 300), 'exp' => rand(20, 25), 'damage' => calculationDamage(7, 10)],
+                Stance::PROACTIVE => ['gold' => rand(500, 700), 'exp' => rand(25, 30), 'damage' => calculationDamage(10, 15)],
             },
             Location::CAVE => match($reserve->stance_id) {
-                Stance::CAUTIOUS => ['gold' => rand(1000, 1200), 'exp' => rand(100, 200), 'damage' => calculationDamage(15, 20)],
-                Stance::NORMAL => ['gold' => rand(1200, 1500), 'exp' => rand(200, 300), 'damage' => calculationDamage(20, 25)],
-                Stance::PROACTIVE => ['gold' => rand(1800, 200), 'exp' => rand(500, 700), 'damage' => calculationDamage(30, 35)],
+                Stance::CAUTIOUS => ['gold' => rand(1000, 1200), 'exp' => rand(30, 35), 'damage' => calculationDamage(20, 25)],
+                Stance::NORMAL => ['gold' => rand(1200, 1500), 'exp' => rand(40, 50), 'damage' => calculationDamage(30, 40)],
+                Stance::PROACTIVE => ['gold' => rand(1800, 2000), 'exp' => rand(60, 70), 'damage' => calculationDamage(40, 50)],
             },
             Location::MOUNTAIN => match($reserve->stance_id) {
-                Stance::CAUTIOUS => ['gold' => rand(1200, 1400), 'exp' => rand(700, 900), 'damage' => calculationDamage(35, 40)],
-                Stance::NORMAL => ['gold' => rand(1400, 1600), 'exp' => rand(900, 1100), 'damage' => calculationDamage(40, 45)],
-                Stance::PROACTIVE => ['gold' => rand(1800, 2000), 'exp' => rand(1500, 1700), 'damage' => calculationDamage(45, 50)],
+                Stance::CAUTIOUS => ['gold' => rand(3000, 3200), 'exp' => rand(75, 80), 'damage' => calculationDamage(60, 65)],
+                Stance::NORMAL => ['gold' => rand(3500, 3800), 'exp' => rand(90, 100), 'damage' => calculationDamage(70, 80)],
+                Stance::PROACTIVE => ['gold' => rand(4000, 5000), 'exp' => rand(110, 120), 'damage' => calculationDamage(90, 100)],
             },
         };
 
-        $sumExp = $character->exp + $exp;
         $nextExp = $character->nextExp;
         $max_hp = $character->max_hp;
         $attack = $character->attack;
@@ -61,6 +60,8 @@ Schedule::call(function()
             $message = "探索成功";
         }
 
+        $sumExp = $character->exp + $exp;
+
         while(true)
         {
             if($nextExp <= $sumExp)
@@ -68,7 +69,7 @@ Schedule::call(function()
                 $level++;
                 $sumExp -= $nextExp;
                 $nextExp = (int)(10 + $level ** 1.2);
-                $max_hp = (int)(100 + $level * 3.6);
+                $max_hp = (int)(20 + $level * 3.6);
                 $attack = (int)(10 + $level * 2.8);
             }
             else
@@ -105,5 +106,5 @@ Schedule::call(function()
 
 function calculationDamage($minLevel, $maxLevel)
 {
-    return rand((int)(100 + $minLevel * 3.6), (int)(100 + $maxLevel * 3.6));
+    return rand((int)(20 + $minLevel * 3.6), (int)(20 + $maxLevel * 3.6));
 }
