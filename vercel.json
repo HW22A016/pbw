@@ -41,6 +41,12 @@
             "dest": "/api/index.php"
         }
     ],
+    "crons": [
+        {
+            "path": "/api/cron/schedule",
+            "schedule": "0 0 * * *"
+        }
+    ],
     "env": {
         "APP_NAME": "Laravel Vercel",
         "APP_DEBUG": "true",
