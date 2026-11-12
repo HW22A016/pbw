@@ -51,12 +51,12 @@ class User extends Authenticatable
 
     public function character(): HasOne
     {
-        return $this->hasOne(character::class);
+        return $this->hasOne(Character::class);
     }
 
     public function actionReserves(): HasMany
     {
-        return $this->hasMany(actionReserve::class);
+        return $this->hasMany(ActionReserve::class);
     }
 
     public function logs(): HasMany
