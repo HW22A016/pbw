@@ -90,7 +90,7 @@
                     <div>
                         <lavel class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">戦闘方針</label>
                         <select name="stance_id" class="w-full rounded border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300">
-                            @foreach(\App\Enums\stance::cases() as $stance)
+                            @foreach(\App\Enums\Stance::cases() as $stance)
                                 <option value="{{ $stance->value }}">
                                     {{ $stance->label() }}
                                 </option>
