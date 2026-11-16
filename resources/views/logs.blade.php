@@ -36,7 +36,7 @@
                                         <td class="px-4 py-3">#{{ $log->turn_number }}</td>
                                         <td class="px-4 py-3">#{{ $log->location_id->label() }}</td>
                                         <td class="px-4 py-3">#{{ $log->stance_id->label() }}</td>
-                                        <td class="px-4 py-3">{{ $log->message }}</td>
+                                        <td class="px-4 py-3">{!! nl2br($log->message) !!}</td>
                                         <td class="px-4 py-3">{{ $log->gained_exp }}</td>
                                         <td class="px-4 py-3">{{ $log->gained_gold }}</td>
                                         <td class="px-4 py-3">{{ $log->hp_change }}</td>
