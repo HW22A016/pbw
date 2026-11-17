@@ -49,10 +49,12 @@ Schedule::call(function()
             {
                 // 宝箱処理
                 case 0:
-                    $gold = rand(10, 100);
-                    $message = "宝箱を見つけた! {$gold}G を手に入れた\n";
+                    ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $message] = getTreasure($reserve->location_id, $reserve->stance_id);
 
                     $totalGold += $gold;
+                    $totalExp += $exp;
+                    $totalDamage += $damage;
+                    $totalMessage .= $message;
                     break;
                 // 戦闘処理
                 case 1:
@@ -74,27 +76,6 @@ Schedule::call(function()
                     $totalExp += $exp;
                     $subExp += $exp;
                     $totalDamage += $damage;
-
-                    // レベルアップ処理
-                    $levelUpCount = 0;
-                    while(true)
-                    {
-                        if($nextExp <= $subExp)
-                        {
-                            $levelUpCount++;
-                            $message .= "レベルが {$levelUpCount} あがった!\n";
-                            $level++;
-                            $subExp -= $nextExp;
-                            $nextExp = (int)(10 + $level ** 1.2);
-                            $max_hp = (int)(20 + $level * 3.6);
-                            $attack = (int)(10 + $level * 2.8);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
                     break;
                 // 適当処理
                 case 2:
@@ -104,10 +85,32 @@ Schedule::call(function()
 
             $totalMessage .= $message;
 
+            // 死亡時ゴールドを0に
             if($dead)
             {
                 $totalGold = 0;
+                $message .= "死亡した";
                 break;
+            }
+
+            // レベルアップ処理
+            $levelUpCount = 0;
+            while(true)
+            {
+                if($nextExp <= $subExp)
+                {
+                    $levelUpCount++;
+                    $message .= "レベルが {$levelUpCount} あがった!\n";
+                    $level++;
+                    $subExp -= $nextExp;
+                    $nextExp = (int)(10 + $level ** 1.2);
+                    $max_hp = (int)(100 + $level * 3.6);
+                    $attack = (int)(10 + $level * 2.8);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
@@ -140,4 +143,98 @@ Schedule::call(function()
 function calculationDamage($minLevel, $maxLevel)
 {
     return rand((int)(20 + $minLevel * 3.6), (int)(20 + $maxLevel * 3.6));
+}
+
+function getTreasure($location_id, $stance_id)
+{
+    $gold = 0;
+    $exp = 0;
+    $damage = 0;
+    $message = "";
+
+    // ミミックの出現確率
+    $mimicRate = match($location_id)
+    {
+        Location::FOREST => 5,
+        Location::CAVE => 50,
+        Location::MOUNTAIN => 30,
+    };
+
+    // ミミック警戒度
+    $vigilanceRate = match($stance_id)
+    {
+        Stance::CAUTIOUS => 100,
+        Stance::NORMAL => 50,
+        Stance::PROACTIVE => 0,
+    };
+
+    // ミミック判定
+    $isMimic = (rand(1, 100) <= $mimicRate);
+    $isAttack = (rand(1, 100) <= $vigilanceRate);
+
+    if($isMimic)
+    {
+        $exp = match($location_id)
+        {
+            Location::FOREST => rand(5, 10),
+            Location::CAVE => rand(15, 30),
+            Location::MOUNTAIN => rand(45, 80)
+        };
+
+        if($isAttack)
+        {
+            $message = "宝箱を攻撃したら、ミミックだった! 経験値を {$exp} 獲得\n";
+        }
+        else
+        {
+            $damage = match($location_id)
+            {
+                Location::FOREST => rand(5, 10),
+                Location::CAVE => rand(15, 25),
+                Location::MOUNTAIN => rand(45, 60)
+            };
+
+            $message = "宝箱を開けたら、ミミックだった!  {$damage}のダメージを受けた。 経験値を {$exp} 獲得\n";
+        }
+    }
+    else
+    {
+        // ゴールド
+        $gold = match($location_id)
+        {
+            Location::FOREST => match($stance_id)
+            {
+                Stance::CAUTIOUS => rand(10, 100),
+                Stance::NORMAL => rand(100, 300),
+                Stance::PROACTIVE => rand(500, 700),
+            },
+            Location::CAVE => match($stance_id) {
+                Stance::CAUTIOUS => rand(1000, 1200),
+                Stance::NORMAL => rand(1200, 1500),
+                Stance::PROACTIVE => rand(1800, 2000),
+            },
+            Location::MOUNTAIN => match($stance_id) {
+                Stance::CAUTIOUS => rand(3000, 3200),
+                Stance::NORMAL => rand(3500, 3800),
+                Stance::PROACTIVE => rand(4000, 5000),
+            },
+        };
+
+        $message = "宝箱を見つけた! {$gold}G を手に入れた\n";
+
+        if($isAttack)
+        {
+            $loss = round($gold * (rand(1, 100) / 100));
+            $gold -= $loss;
+
+            $message = "ミミックを警戒して宝箱攻撃した! 宝箱の中身が壊れて {$loss}G 失って {$gold}G を手に入れた\n";
+        }
+    }
+
+    return [
+        'gold' => $gold,
+        'exp' => $exp,
+        'damage' => $damage,
+        'message' => $message
+    ];
 }
