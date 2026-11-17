@@ -38,23 +38,24 @@ Schedule::call(function()
         $totalGold = 0;
         $totalExp = 0;
         $totalDamage = 0;
-        $totalMessage = "";
+        $totalMessage = $reserve->location_id->label() . "へ冒険に出かけた!\n\n";
 
         $dead = false;
 
         for($i = 0; $i < $actionCount; $i++)
         {
+            $message = "";
             $eventType = rand(0, 2);
             switch($eventType)
             {
                 // 宝箱処理
                 case 0:
-                    ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $message] = getTreasure($reserve->location_id, $reserve->stance_id);
+                    ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $subMessage] = getTreasure($reserve->location_id, $reserve->stance_id);
 
                     $totalGold += $gold;
                     $totalExp += $exp;
                     $totalDamage += $damage;
-                    $totalMessage .= $message;
+                    $message .= $subMessage;
                     break;
                 // 戦闘処理
                 case 1:
@@ -62,7 +63,7 @@ Schedule::call(function()
                     $damage = rand(5, 10);
                     $hp -= $damage;
 
-                    $message = "ゴブリンに出会った! {$damage}のダメージを受けた。";
+                    $message .= "ゴブリンに出会った!\n{$damage} のダメージを受けた。";
 
                     if($hp <= 0)
                     {
@@ -71,7 +72,7 @@ Schedule::call(function()
                         break;
                     }
 
-                    $message .= " exp{$exp} を獲得\n";
+                    $message .= "ゴブリンを倒してexp{$exp} を獲得\n";
 
                     $totalExp += $exp;
                     $subExp += $exp;
@@ -79,17 +80,14 @@ Schedule::call(function()
                     break;
                 // 適当処理
                 case 2:
-                    $message = "奥に進んだ\n";
+                    $message .= "奥に進んだ\n";
                     break;
             }
-
-            $totalMessage .= $message;
 
             // 死亡時ゴールドを0に
             if($dead)
             {
                 $totalGold = 0;
-                $message .= "死亡した";
                 break;
             }
 
@@ -112,6 +110,17 @@ Schedule::call(function()
                     break;
                 }
             }
+
+            $totalMessage .= $message . "\n";
+        }
+
+        if($dead)
+        {
+            $totalMessage .= "死亡した";
+        }
+        else
+        {
+            $totalMessage .= "帰還した";
         }
 
         $character->level = $level;
@@ -183,7 +192,7 @@ function getTreasure($location_id, $stance_id)
 
         if($isAttack)
         {
-            $message = "宝箱を攻撃したら、ミミックだった! 経験値を {$exp} 獲得\n";
+            $message = "宝箱を攻撃したら、ミミックだった!\nミミックを倒して経験値を {$exp} 獲得\n";
         }
         else
         {
@@ -194,7 +203,7 @@ function getTreasure($location_id, $stance_id)
                 Location::MOUNTAIN => rand(45, 60)
             };
 
-            $message = "宝箱を開けたら、ミミックだった!  {$damage}のダメージを受けた。 経験値を {$exp} 獲得\n";
+            $message = "宝箱を開けたら、ミミックだった!\n{$damage} のダメージを受けた。 ミミックを倒して経験値を {$exp} 獲得\n";
         }
     }
     else
@@ -220,14 +229,14 @@ function getTreasure($location_id, $stance_id)
             },
         };
 
-        $message = "宝箱を見つけた! {$gold}G を手に入れた\n";
+        $message = "宝箱を見つけた!\n{$gold}G を手に入れた\n";
 
         if($isAttack)
         {
             $loss = round($gold * (rand(1, 100) / 100));
             $gold -= $loss;
 
-            $message = "ミミックを警戒して宝箱攻撃した! 宝箱の中身が壊れて {$loss}G 失って {$gold}G を手に入れた\n";
+            $message = "ミミックを警戒して宝箱攻撃した!\n宝箱の中身が壊れて {$loss}G 失って {$gold}G を手に入れた\n";
         }
     }
 
