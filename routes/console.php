@@ -25,6 +25,8 @@ Schedule::call(function()
         $user = $reserve->user;
         $character = $user->character;
 
+        $location_id = $reserve->location_id;
+
         $level = $character->level;
         $subExp = $character->exp;
         $nextExp = $character->nextExp;
@@ -50,7 +52,7 @@ Schedule::call(function()
             {
                 // 宝箱処理
                 case 0:
-                    ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $subMessage] = getTreasure($reserve->location_id, $reserve->stance_id);
+                    ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $subMessage] = getTreasure($location_id, $reserve->stance_id);
 
                     $totalGold += $gold;
                     $totalExp += $exp;
@@ -59,11 +61,10 @@ Schedule::call(function()
                     break;
                 // 戦闘処理
                 case 1:
-                    $exp = rand(5, 10);
-                    $damage = rand(5, 10);
+                    ['enemyName' => $enemyName, 'exp' => $exp, 'damage' => $damage] = getEnemy($location_id);
                     $hp -= $damage;
 
-                    $message .= "ゴブリンに出会った!\n{$damage} のダメージを受けた。";
+                    $message .= "{$enemyName} に出会った!\n{$damage} ダメージを受けた。";
 
                     if($hp <= 0)
                     {
@@ -72,7 +73,7 @@ Schedule::call(function()
                         break;
                     }
 
-                    $message .= "ゴブリンを倒してexp{$exp} を獲得\n";
+                    $message .= "{$enemyName} を倒してexp{$exp} を獲得\n";
 
                     $totalExp += $exp;
                     $subExp += $exp;
@@ -154,6 +155,36 @@ function calculationDamage($minLevel, $maxLevel)
     return rand((int)(20 + $minLevel * 3.6), (int)(20 + $maxLevel * 3.6));
 }
 
+function getEnemy($location_id)
+{
+    $enemyPool = match($location_id)
+    {
+        Location::FOREST => [
+            ['name' => 'スライム', 'exp' => rand(1, 3), 'damage' => rand(1, 3)],
+            ['name' => 'ゴブリン', 'exp' => rand(5, 10), 'damage' => rand(5, 10)],
+            ['name' => 'トレント', 'exp' => rand(10, 15), 'damage' => rand(10, 15)],
+        ],
+        Location::CAVE => [
+            ['name' => 'スケルトン', 'exp' => rand(20, 25), 'damage' => rand(20, 25)],
+            ['name' => 'ミノタウロス', 'exp' => rand(30, 35), 'damage' => rand(30, 35)],
+            ['name' => 'オーガ', 'exp' => rand(40, 45), 'damage' => rand(40, 45)],
+        ],
+        Location::MOUNTAIN => [
+            ['name' => 'ハーピィ', 'exp' => rand(50, 55), 'damage' => rand(50, 55)],
+            ['name' => 'ワイバーン', 'exp' => rand(60, 80), 'damage' => rand(80, 100)],
+            ['name' => '黒竜', 'exp' => rand(100, 150), 'damage' => rand(150, 300)],
+        ],
+    };
+
+    $enemy = $enemyPool[array_rand($enemyPool)];
+
+    return [
+        'enemyName' => $enemy['name'],
+        'exp' => $enemy['exp'],
+        'damage' => $enemy['damage'],
+    ];
+}
+
 function getTreasure($location_id, $stance_id)
 {
     $gold = 0;
@@ -203,7 +234,7 @@ function getTreasure($location_id, $stance_id)
                 Location::MOUNTAIN => rand(45, 60)
             };
 
-            $message = "宝箱を開けたら、ミミックだった!\n{$damage} のダメージを受けた。 ミミックを倒して経験値を {$exp} 獲得\n";
+            $message = "宝箱を開けたら、ミミックだった!\n{$damage} ダメージを受けた。 ミミックを倒して経験値を {$exp} 獲得\n";
         }
     }
     else
