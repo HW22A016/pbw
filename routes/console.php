@@ -26,9 +26,12 @@ Schedule::call(function()
         $character = $user->character;
 
         $location_id = $reserve->location_id;
+        $stance_id = $reserve->stance_id;
 
         $level = $character->level;
+        // 今持っている経験値量
         $subExp = $character->exp;
+        // 次のlevelまでの必要経験値量
         $nextExp = $character->nextExp;
         $max_hp = $character->max_hp;
         $attack = $character->attack;
@@ -54,34 +57,46 @@ Schedule::call(function()
                 case 0:
                     ['gold' => $gold, 'exp' => $exp, 'damage' => $damage, 'message' => $subMessage] = getTreasure($location_id, $reserve->stance_id);
 
-                    $totalGold += $gold;
-                    $totalExp += $exp;
                     $totalDamage += $damage;
                     $message .= $subMessage;
+                    if($max_hp <= $totalDamage)
+                    {
+                        $dead = true;
+                        break;
+                    }
+
+                    // ダメージがある時
+                    if($damage !== 0)
+                    {
+                        $message .= "{$damage} ダメージを受けた。 ミミックを倒して経験値を {$exp} 獲得\n";
+                    }
+
+                    $totalGold += $gold;
+                    $totalExp += $exp;
+                    $subExp += $exp;
+
                     break;
                 // 戦闘処理
                 case 1:
                     ['enemyName' => $enemyName, 'exp' => $exp, 'damage' => $damage] = getEnemy($location_id);
-                    $hp -= $damage;
+                    $totalDamage += $damage;
 
-                    $message .= "{$enemyName} に出会った!\n{$damage} ダメージを受けた。";
+                    $message .= "{$enemyName} に出会った!";
 
-                    if($hp <= 0)
+                    if($max_hp <= $totalDamage)
                     {
                         $dead = true;
-                        $message .= "\nHPが0になった。";
                         break;
                     }
 
-                    $message .= "{$enemyName} を倒してexp{$exp} を獲得\n";
+                    $message .= "\n{$damage} ダメージを受けた。\n{$enemyName} 経験値 {$exp} を獲得\n";
 
                     $totalExp += $exp;
                     $subExp += $exp;
-                    $totalDamage += $damage;
                     break;
                 // 適当処理
                 case 2:
-                    $message .= "奥に進んだ\n";
+                    $message .= getMoveMessages($location_id);
                     break;
             }
 
@@ -89,6 +104,7 @@ Schedule::call(function()
             if($dead)
             {
                 $totalGold = 0;
+                $totalMessage .= $message . "\n";
                 break;
             }
 
@@ -99,7 +115,6 @@ Schedule::call(function()
                 if($nextExp <= $subExp)
                 {
                     $levelUpCount++;
-                    $message .= "レベルが {$levelUpCount} あがった!\n";
                     $level++;
                     $subExp -= $nextExp;
                     $nextExp = (int)(10 + $level ** 1.2);
@@ -111,13 +126,25 @@ Schedule::call(function()
                     break;
                 }
             }
+            if($levelUpCount !== 0)
+            {
+                $message .= "\nレベルが {$levelUpCount} あがった!\n";
+            }
 
             $totalMessage .= $message . "\n";
         }
 
         if($dead)
         {
-            $totalMessage .= "死亡した";
+            if($stance_id === Stance::CAUTIOUS)
+            {
+                $totalDamage -= $damage;
+                $totalMessage .= "勝てない相手だと悟った...\n\n命からがら逃げだした!";
+            }
+            else
+            {
+                $totalMessage .= "{$damage} ダメージを受けた。\n\nHPが0になった。\n\n死亡した";
+            }
         }
         else
         {
@@ -138,7 +165,7 @@ Schedule::call(function()
             "location_id" => $reserve->location_id,
             "stance_id" => $reserve->stance_id,
             'message' => $totalMessage,
-            "gained_exp" => $exp,
+            "gained_exp" => $totalExp,
             "gained_gold" => $totalGold,
             "hp_change" => $totalDamage,
         ]);
@@ -234,7 +261,7 @@ function getTreasure($location_id, $stance_id)
                 Location::MOUNTAIN => rand(45, 60)
             };
 
-            $message = "宝箱を開けたら、ミミックだった!\n{$damage} ダメージを受けた。 ミミックを倒して経験値を {$exp} 獲得\n";
+            $message = "宝箱を開けたら、ミミックだった!";
         }
     }
     else
@@ -277,4 +304,28 @@ function getTreasure($location_id, $stance_id)
         'damage' => $damage,
         'message' => $message
     ];
+}
+
+function getMoveMessages($location_id)
+{
+    $moveMessage = match($location_id)
+    {
+        Location::FOREST => [
+            "大きい木を目指して進んだ。",
+            "背の高い草の間をかき分けて進んだ。",
+            "獣道に沿って進んだ。",
+        ],
+        Location::CAVE => [
+            "分かれ道を右に進んだ。",
+            "分かれ道を左に進んだ。",
+            "さらに奥へ進んだ。",
+        ],
+        Location::MOUNTAIN => [
+            "急な坂道を登った。",
+            "道がないため、断崖絶壁をよじ登った。",
+            "足一つ分しか無い細い道を進んだ。",
+        ],
+    };
+
+    return $moveMessage[array_rand($moveMessage)] . "\n";
 }
