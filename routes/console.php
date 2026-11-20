@@ -78,18 +78,27 @@ Schedule::call(function()
                     break;
                 // 戦闘処理
                 case 1:
-                    ['enemyName' => $enemyName, 'exp' => $exp, 'damage' => $damage] = getEnemy($location_id);
-                    $totalDamage += $damage;
+                    ['enemyName' => $enemyName, 'exp' => $exp, 'hp' => $enemyHP, 'damage' => $damage] = getEnemy($location_id);
 
                     $message .= "{$enemyName} に出会った!";
 
-                    if($max_hp <= $totalDamage)
+                    // 敵を一撃で倒せるときダメージを0にする
+                    if($enemyHP <= $attack)
                     {
-                        $dead = true;
-                        break;
+                        $damage = 0;
+                        $message .= "\n{$enemyName}を一撃で倒した。\n 経験値 {$exp} を獲得\n";
                     }
+                    else
+                    {
+                        $totalDamage += $damage;
 
-                    $message .= "\n{$damage} ダメージを受けた。\n{$enemyName} 経験値 {$exp} を獲得\n";
+                        if($max_hp <= $totalDamage)
+                        {
+                            $dead = true;
+                            break;
+                        }
+                        $message .= "\n{$damage} ダメージを受けた。\n{$enemyName} 経験値 {$exp} を獲得\n";
+                    }
 
                     $totalExp += $exp;
                     $subExp += $exp;
@@ -98,14 +107,6 @@ Schedule::call(function()
                 case 2:
                     $message .= getMoveMessages($location_id);
                     break;
-            }
-
-            // 死亡時ゴールドを0に
-            if($dead)
-            {
-                $totalGold = 0;
-                $totalMessage .= $message . "\n";
-                break;
             }
 
             // レベルアップ処理
@@ -132,10 +133,16 @@ Schedule::call(function()
             }
 
             $totalMessage .= $message . "\n";
+
+            if($dead)
+            {
+                break;
+            }
         }
 
         if($dead)
         {
+            $totalGold = 0;
             if($stance_id === Stance::CAUTIOUS)
             {
                 $totalDamage -= $damage;
@@ -187,19 +194,19 @@ function getEnemy($location_id)
     $enemyPool = match($location_id)
     {
         Location::FOREST => [
-            ['name' => 'スライム', 'exp' => rand(1, 3), 'damage' => rand(1, 3)],
-            ['name' => 'ゴブリン', 'exp' => rand(5, 10), 'damage' => rand(5, 10)],
-            ['name' => 'トレント', 'exp' => rand(10, 15), 'damage' => rand(10, 15)],
+            ['name' => 'スライム', 'exp' => rand(1, 3), 'hp' => 30, 'damage' => rand(1, 3)],
+            ['name' => 'ゴブリン', 'exp' => rand(5, 10), 'hp' => 45, 'damage' => rand(5, 10)],
+            ['name' => 'トレント', 'exp' => rand(10, 15), 'hp'=> 60, 'damage' => rand(10, 15)],
         ],
         Location::CAVE => [
-            ['name' => 'スケルトン', 'exp' => rand(20, 25), 'damage' => rand(20, 25)],
-            ['name' => 'ミノタウロス', 'exp' => rand(30, 35), 'damage' => rand(30, 35)],
-            ['name' => 'オーガ', 'exp' => rand(40, 45), 'damage' => rand(40, 45)],
+            ['name' => 'スケルトン', 'exp' => rand(20, 25), 'hp' => 80, 'damage' => rand(50, 60)],
+            ['name' => 'ミノタウロス', 'exp' => rand(35, 40), 'hp' => 100, 'damage' => rand(70, 80)],
+            ['name' => 'オーガ', 'exp' => rand(40, 50), 'hp' => 120 ,'damage' => rand(80, 100)],
         ],
         Location::MOUNTAIN => [
-            ['name' => 'ハーピィ', 'exp' => rand(50, 55), 'damage' => rand(50, 55)],
-            ['name' => 'ワイバーン', 'exp' => rand(60, 80), 'damage' => rand(80, 100)],
-            ['name' => '黒竜', 'exp' => rand(100, 150), 'damage' => rand(150, 300)],
+            ['name' => 'ハーピィ', 'exp' => rand(50, 60), 'hp' => 100, 'damage' => rand(80, 100)],
+            ['name' => 'ワイバーン', 'exp' => rand(125, 175), 'hp' => 250, 'damage' => rand(250, 350)],
+            ['name' => '黒竜', 'exp' => rand(225, 250), 'hp' => 500, 'damage' => rand(450, 500)],
         ],
     };
 
@@ -208,6 +215,7 @@ function getEnemy($location_id)
     return [
         'enemyName' => $enemy['name'],
         'exp' => $enemy['exp'],
+        'hp' => $enemy['hp'],
         'damage' => $enemy['damage'],
     ];
 }
@@ -257,8 +265,8 @@ function getTreasure($location_id, $stance_id)
             $damage = match($location_id)
             {
                 Location::FOREST => rand(5, 10),
-                Location::CAVE => rand(15, 25),
-                Location::MOUNTAIN => rand(45, 60)
+                Location::CAVE => rand(30, 50),
+                Location::MOUNTAIN => rand(60, 80)
             };
 
             $message = "宝箱を開けたら、ミミックだった!";
