@@ -44,7 +44,7 @@
     "crons": [
         {
             "path": "/cron",
-            "schedule": "6 14 * * *"
+            "schedule": "0 15 * * *"
         }
     ],
     "env": {
